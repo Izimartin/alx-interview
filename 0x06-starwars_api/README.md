@@ -15,4 +15,4 @@ What you should learn from this project:
 ---
 
 ## Author
-* **Geoffrey Zoref** - [Gzoref](https://github.com/Gzoref)
+* **Izi Martinf** - [Izimartin](https://github.com/Izimartin)
