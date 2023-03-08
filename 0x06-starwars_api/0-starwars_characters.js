@@ -1,6 +1,6 @@
 #!/usr/bin/node
 
-// const request = require('request');
+// const request = require("request");
 // const filmId = process.argv[2];
 // const url = `https://swapi-api.hbtn.io/api/films/${filmId}`;
 
@@ -21,46 +21,31 @@
 //   }
 // });
 
+const request = require("request");
 
-const axios = require('axios');
+const options = {
+  url: "https://swapi-api.hbtn.io/api/films/${filmId}" + process.argv[2],
+  headers: {
+    "User-Agent": "request",
+  },
+};
 
-// Define the base URL of the Star Wars API
-const baseUrl = 'https://swapi.dev/api';
-
-// Define a function to retrieve the characters of a movie by its ID
-async function getCharacters(movieId) {
-  try {
-    // Send a GET request to the API to retrieve the movie details
-    const movieUrl = `${baseUrl}/films/${movieId}/`;
-    const movieResponse = await axios.get(movieUrl);
-
-    // Extract the list of characters from the movie details
-    const characters = movieResponse.data.characters;
-
-    // Send a GET request to retrieve the details of each character
-    const characterNames = await Promise.all(characters.map(async (characterUrl) => {
-      const characterResponse = await axios.get(characterUrl);
-      return characterResponse.data.name;
-    }));
-
-    return characterNames;
-  } catch (error) {
-    console.error(`Error: Could not retrieve movie details. ${error.message}`);
-    return [];
+request(options, function (error, response, body) {
+  if (error) {
+    console.error("error:", error);
+    return;
   }
-}
-
-// Check if a movie ID was provided as a command-line argument
-const movieId = process.argv[2];
-if (!movieId) {
-  console.error('Usage: node star_wars_characters.js <movie_id>');
-  process.exit(1);
-}
-
-// Retrieve the movie characters and print them
-getCharacters(movieId)
-  .then((characterNames) => {
-    characterNames.forEach((name) => console.log(name));
-  })
-  .catch((error) => console.error(error.message));
-
+  const characters = JSON.parse(body).characters;
+  for (const characterUrl of characters) {
+    request(
+      { url: characterUrl, headers: { "User-Agent": "request" } },
+      function (error, response, body) {
+        if (error) {
+          console.error("error:", error);
+          return;
+        }
+        console.log(JSON.parse(body).name);
+      }
+    );
+  }
+});
